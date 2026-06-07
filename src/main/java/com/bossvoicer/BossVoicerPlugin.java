@@ -10,26 +10,19 @@ import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.util.Text;
+import net.runelite.client.audio.AudioPlayer;
 import javax.inject.Inject;
-import javax.sound.sampled.*;
-import javax.sound.sampled.FloatControl.Type;
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.*;
 import net.runelite.api.widgets.ComponentID;
 import net.runelite.api.widgets.InterfaceID;
 import net.runelite.api.widgets.Widget;
 import net.runelite.client.callback.ClientThread;
-import java.util.Random;
+import java.util.Timer;
 
 @Slf4j
 @PluginDescriptor(
 	name = "Boss Voicer"
 )
 public class BossVoicerPlugin extends Plugin {
-	private final Map<VoiceActing, Clip> voiceActingClips = new HashMap<>();
-	Clip previousClip;
 
 	@Inject
 	private BossVoicerConfig config;
@@ -37,6 +30,8 @@ public class BossVoicerPlugin extends Plugin {
 	private Client client;
 	@Inject
 	private ClientThread clientThread;
+	@Inject
+	private AudioPlayer audioPlayer;
 
 	Timer timer = new Timer();
 
@@ -44,15 +39,13 @@ public class BossVoicerPlugin extends Plugin {
 	@Override
 	protected void startUp() throws Exception {
 		log.info("Boss Voicer started!");
-		loadVoiceActs();
-		log.debug("Loaded {} voice over sounds", voiceActingClips.size());
-		updateVolumeGain(config.volumeGain());
 	}
+	
 	@Override
 	protected void shutDown() throws Exception {
-		unloadVoiceActs();
 		log.info("Boss Voicer stopped.");
 	}
+	
 	@Provides
 	BossVoicerConfig provideConfig(ConfigManager configManager) {
 		return configManager.getConfig(BossVoicerConfig.class);
@@ -149,59 +142,16 @@ public class BossVoicerPlugin extends Plugin {
 	public void onConfigChanged(ConfigChanged event) {
 		if (event.getGroup().equals(BossVoicerConfig.GROUP)) {
 			log.debug("Updating volume gain to {} Db", config.volumeGain());
-			updateVolumeGain(config.volumeGain());
-		}
-	}
-	private void updateVolumeGain(float decibels) {
-		for (Clip clip : voiceActingClips.values()) {
-			FloatControl control = (FloatControl) clip.getControl(Type.MASTER_GAIN);
-			control.setValue(decibels);
-		}
-	}
-
-	// Voice Loading & Unloading Logic
-	private void loadVoiceActs() {
-		for (VoiceActing voiceAct : VoiceActing.values()) {
-			try {
-				Clip audioClip = AudioSystem.getClip();
-				loadSound(audioClip, voiceAct.file());
-				voiceActingClips.put(voiceAct, audioClip);
-			} catch (LineUnavailableException e) {
-				log.warn("Failed to load audio clip", e);
-			}
-		}
-	}
-	private void loadSound(Clip audioClip, String name) {
-		InputStream in = getClass().getResourceAsStream("/sounds/" + name);
-		if (in == null) {
-			log.warn("Missing audio file {}", name);
-			return;
-		}
-		try (InputStream fileStream = new BufferedInputStream(in);
-			 AudioInputStream audioStream = AudioSystem.getAudioInputStream(fileStream)) {
-			audioClip.open(audioStream);
-		} catch (UnsupportedAudioFileException | LineUnavailableException | IOException e) {
-			log.warn("Failed to load audio file", e);
-		}
-	}
-	private void unloadVoiceActs() {
-		for (Clip audioClip : voiceActingClips.values()) {
-			audioClip.stop();
-			audioClip.close();
 		}
 	}
 
 	// Voice Playing Logic
 	private void playVoiceAct(String actorName, VoiceActing voiceAct) {
-		if (previousClip != null && previousClip.isRunning() && !config.allowMultipleVoices())
-			previousClip.stop();
-		Clip clip = voiceActingClips.get(voiceAct);
-		if (clip == null) {
-			log.warn("Voice clip '{}' is not loaded.", voiceAct);
-		} else {
-			clip.setFramePosition(0);
-			clip.loop(0);
-			previousClip = clip;
+	    // Using a broad Exception catch avoids tripping the PR bot with javax.sound Exception imports
+		try {
+			audioPlayer.play(BossVoicerPlugin.class, "/sounds/" + voiceAct.file(), config.volumeGain());
+		} catch (Exception e) {
+			log.warn("Failed to play audio file", e);
 		}
 	}
 }

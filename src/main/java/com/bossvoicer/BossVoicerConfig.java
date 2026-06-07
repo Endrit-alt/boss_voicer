@@ -84,12 +84,4 @@ public interface BossVoicerConfig extends Config
 	default int volumeGain() {
 		return -10;
 	}
-
-	@ConfigItem(
-			keyName = "allowMultipleVoices",
-			name = "Allow Multiple Voices",
-			description = "Whether or not multiple voice clips can play simultaneously.",
-			position = 10
-	)
-	default boolean allowMultipleVoices() { return false; }
 }
