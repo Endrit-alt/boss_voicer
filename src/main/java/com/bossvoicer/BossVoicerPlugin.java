@@ -108,13 +108,6 @@ public class BossVoicerPlugin extends Plugin {
 					|| (actorName.equals("Torag the Corrupted") && config.includeBarrows())
 					|| (actorName.equals("Verac the Defiled") && config.includeBarrows())) {
 				String text = Text.removeTags(event.getOverheadText());
-				if (actorName.equals("Sol Heredit") && text.equals("I'LL TWIST YOUR HANDS OFF!")) {
-					Random rand = new Random();
-					int n = rand.nextInt(10);
-					if (n == 9) {
-						text = "I'LL TWIST YOUR D... OFF!"; // hehe
-					}
-				}
 				log.debug("About to try to play a sound from an overhead : " + text);
 				VoiceActing voiceAct = VoiceActing.forTriggerLine(text);
 				if (voiceAct == null) {

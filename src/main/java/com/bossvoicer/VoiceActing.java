@@ -121,7 +121,6 @@ public enum VoiceActing {
     BREAK_BACK("I'LL BREAK YOUR BACK!","sol/break_your_back.wav"),
     CRUSH_BODY("I'LL CRUSH YOUR BODY!","sol/crush_your_body.wav"),
     TWIST_HANDS("I'LL TWIST YOUR HANDS OFF!","sol/twist_your_hands_off.wav"),
-    TWIST_D("I'LL TWIST YOUR D... OFF!","sol/twist_your_d_off.wav"),
     BREAK_LEGS("I'LL BREAK YOUR LEGS!","sol/break_your_legs.wav"),
     CUT_FEET("I'LL CUT YOUR FEET OFF!","sol/cut_your_feet_off.wav"),
     SHINES_BRIGHTLY("Your light shines... brightly...","sol/your_light_shines_brightly.wav"),
