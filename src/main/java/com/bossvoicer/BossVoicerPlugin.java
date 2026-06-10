@@ -149,9 +149,28 @@ public class BossVoicerPlugin extends Plugin {
 	private void playVoiceAct(String actorName, VoiceActing voiceAct) {
 	    // Using a broad Exception catch avoids tripping the PR bot with javax.sound Exception imports
 		try {
-			audioPlayer.play(BossVoicerPlugin.class, "/sounds/" + voiceAct.file(), config.volumeGain());
+			audioPlayer.play(BossVoicerPlugin.class, "/sounds/" + voiceFile(voiceAct), config.volumeGain());
 		} catch (Exception e) {
 			log.warn("Failed to play audio file", e);
 		}
+	}
+
+	private String voiceFile(VoiceActing voiceAct) {
+		String file = voiceAct.file();
+		if (!config.useV2Voices()) {
+			return file;
+		}
+
+		if (file.startsWith("kril/")) {
+			return "kril_v2/" + file.substring("kril/".length());
+		}
+		if (file.startsWith("verzik/")) {
+			return "verzik_v2/" + file.substring("verzik/".length());
+		}
+		if (file.startsWith("sol/")) {
+			return "sol_v2/" + file.substring("sol/".length());
+		}
+
+		return file;
 	}
 }
