@@ -161,9 +161,6 @@ public class BossVoicerPlugin extends Plugin {
 			return file;
 		}
 
-		if (file.startsWith("kril/")) {
-			return "kril_v2/" + file.substring("kril/".length());
-		}
 		if (file.startsWith("verzik/")) {
 			return "verzik_v2/" + file.substring("verzik/".length());
 		}

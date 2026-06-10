@@ -100,7 +100,7 @@ public interface BossVoicerConfig extends Config
 	@ConfigItem(
 			keyName = "useV2Voices",
 			name = "Immersive Voices",
-			description = "Use the _v2 voice folders for K'ril Tsutsaroth, Verzik Vitur, and Sol Heredit.",
+			description = "Use the _v2 voice folders for Verzik Vitur and Sol Heredit.",
 			position = 1,
 			section = voiceSettings
 	)
